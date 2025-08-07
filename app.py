@@ -119,8 +119,4 @@ with col8:
     sns.barplot(data=filtered_df, x="Sex", y="Survived", ci=None, ax=ax8, palette="coolwarm")
     st.pyplot(fig8)
 
-# ===== ROW 5 =====
-col9, col10 = st.columns(2)
-with col9:
-    st.markdown("#### 🧠 Correlation Heatmap")
-    fig
+
