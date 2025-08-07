@@ -14,7 +14,7 @@ st.markdown(
     """
     <style>
     .stApp {
-        background-image: url("https://images.unsplash.com/photo-1607746882042-944635dfe10e");
+        background-image: url("https://upload.wikimedia.org/wikipedia/commons/f/fd/RMS_Titanic_3.jpg");
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
@@ -28,6 +28,14 @@ st.markdown(
 
     .css-1v0mbdj, .css-1dp5vir {
         background-color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .css-18e3th9 {
+        background-color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    h1, h2, h3, h4 {
+        color: #1e1e1e;
     }
     </style>
     """,
@@ -146,3 +154,4 @@ st.pyplot(fig11)
 # ===== Footer =====
 st.markdown("---")
 st.markdown("💡 *Use the sidebar to explore Titanic passengers by class, gender, age, and fare.*")
+
