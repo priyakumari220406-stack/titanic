@@ -55,21 +55,35 @@ if st.checkbox("Show Raw Data"):
 # ===== Sidebar Filters =====
 st.sidebar.header("🔍 Filter Options")
 
-gender = st.sidebar.multiselect("Select Gender", options=df["Sex"].unique(), default=list(df["Sex"].unique()))
-pclass = st.sidebar.multiselect("Select Passenger Class", options=sorted(df["Pclass"].unique()), default=sorted(df["Pclass"].unique()))
-age_range = st.sidebar.slider("Select Age Range", min_value=int(df["Age"].min()), max_value=int(df["Age"].max()), value=(int(df["Age"].min()), int(df["Age"].max())))
-fare_range = st.sidebar.slider("Select Fare Range", min_value=int(df["Fare"].min()), max_value=int(df["Fare"].max()), value=(int(df["Fare"].min()), int(df["Fare"].max())))
+with st.sidebar.expander("Filter by Gender", expanded=True):
+    gender = st.multiselect(
+        "Select Gender",
+        options=df["Sex"].unique(),
+        default=list(df["Sex"].unique())
+    )
 
-# ===== Filter Data =====
-filtered_df = df[
-    (df["Sex"].isin(gender)) &
-    (df["Pclass"].isin(pclass)) &
-    (df["Age"].between(age_range[0], age_range[1])) &
-    (df["Fare"].between(fare_range[0], fare_range[1]))
-]
+with st.sidebar.expander("Filter by Passenger Class", expanded=True):
+    pclass = st.multiselect(
+        "Select Passenger Class",
+        options=sorted(df["Pclass"].unique()),
+        default=sorted(df["Pclass"].unique())
+    )
 
-st.subheader("🎯 Filtered Data Preview")
-st.write(filtered_df.head())
+with st.sidebar.expander("Filter by Age Range", expanded=True):
+    age_range = st.slider(
+        "Select Age Range",
+        min_value=int(df["Age"].min()),
+        max_value=int(df["Age"].max()),
+        value=(int(df["Age"].min()), int(df["Age"].max()))
+    )
+
+with st.sidebar.expander("Filter by Fare Range", expanded=True):
+    fare_range = st.slider(
+        "Select Fare Range",
+        min_value=int(df["Fare"].min()),
+        max_value=int(df["Fare"].max()),
+        value=(int(df["Fare"].min()), int(df["Fare"].max()))
+    )
 
 # ===== ROW 1 =====
 col1, col2 = st.columns(2)
@@ -154,4 +168,5 @@ st.pyplot(fig11)
 # ===== Footer =====
 st.markdown("---")
 st.markdown("💡 *Use the sidebar to explore Titanic passengers by class, gender, age, and fare.*")
+
 
