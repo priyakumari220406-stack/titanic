@@ -14,7 +14,7 @@ st.markdown(
     """
     <style>
     .stApp {
-        background-image: url("https://images.unsplash.com/photo-1607746882042-944635dfe10e");
+        background-image: url("titanic.jpg");
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
@@ -146,3 +146,4 @@ st.pyplot(fig11)
 # ===== Footer =====
 st.markdown("---")
 st.markdown("💡 *Use the sidebar to explore Titanic passengers by class, gender, age, and fare.*")
+
