@@ -58,4 +58,5 @@ with col3:
 
 with col4:
     st.markdown("#### 💰 Fare Distribution")
-    fig4, ax4 = plt.subplots(figsize=
+    fig4, ax4 = plt.subplots(figsize=(5,3))
+
