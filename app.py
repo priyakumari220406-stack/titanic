@@ -59,4 +59,41 @@ with col3:
 with col4:
     st.markdown("#### 💰 Fare Distribution")
     fig4, ax4 = plt.subplots(figsize=(5,3))
+    # ================================
+# 🔸 Row 4: Avg Fare by Gender & Avg Age by Class
+col7, col8 = st.columns(2)
+
+with col7:
+    st.markdown("#### 📌 Average Fare by Gender")
+    fig8, ax8 = plt.subplots(figsize=(5, 3))
+    sns.barplot(data=df, x="Sex", y="Fare", ax=ax8)
+    ax8.set_title("Average Fare by Gender")
+    st.pyplot(fig8)
+
+with col8:
+    st.markdown("#### 🎓 Average Age by Class")
+    fig9, ax9 = plt.subplots(figsize=(5, 3))
+    sns.barplot(data=df, x="Pclass", y="Age", ax=ax9)
+    ax9.set_title("Average Age by Class")
+    st.pyplot(fig9)
+
+# ================================
+# 🔸 Row 5: Passenger Count by Embark & Survival by Gender
+col9, col10 = st.columns(2)
+
+with col9:
+    st.markdown("#### 🧾 Passenger Count by Embarkation")
+    fig10, ax10 = plt.subplots(figsize=(5, 3))
+    sns.countplot(data=df, x="Embarked", ax=ax10)
+    ax10.set_title("Embarkation Port Count")
+    st.pyplot(fig10)
+
+with col10:
+    st.markdown("#### ✅ Survival Rate by Gender")
+    fig11, ax11 = plt.subplots(figsize=(5, 3))
+    sns.barplot(data=df, x="Sex", y="Survived", ci=None, ax=ax11)
+    ax11.set_title("Survival Rate by Gender")
+    st.pyplot(fig11)
+
+
 
