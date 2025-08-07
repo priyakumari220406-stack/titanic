@@ -3,6 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Set style
+sns.set_style("whitegrid")
+
 # Page Config
 st.set_page_config(page_title="Titanic EDA Dashboard", layout="wide")
 
@@ -34,66 +37,102 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown("#### 📊 Survival Count by Gender")
     fig1, ax1 = plt.subplots(figsize=(5, 3))
-    sns.countplot(data=filtered_df, x="Survived", hue="Sex", ax=ax1)
+    sns.countplot(data=filtered_df, x="Survived", hue="Sex", ax=ax1, palette="pastel")
     ax1.set_title("Survival by Gender")
     st.pyplot(fig1)
 
 with col2:
     st.markdown("#### 🎂 Age Distribution")
     fig2, ax2 = plt.subplots(figsize=(5, 3))
-    sns.histplot(filtered_df["Age"].dropna(), kde=True, bins=25, ax=ax2)
+    sns.histplot(filtered_df["Age"].dropna(), kde=True, bins=25, ax=ax2, color='skyblue')
     ax2.set_title("Age Distribution")
     st.pyplot(fig2)
 
 # ================================
-# 🔸 Row 2: Survival by Class & Fare
+# 🔸 Row 2: Survival by Class & Fare Distribution
 col3, col4 = st.columns(2)
 
 with col3:
     st.markdown("#### 🏷️ Survival Rate by Class")
     fig3, ax3 = plt.subplots(figsize=(5, 3))
-    sns.barplot(data=df, x="Pclass", y="Survived", ci=None, ax=ax3)
+    sns.barplot(data=df, x="Pclass", y="Survived", ci=None, ax=ax3, palette="Blues")
     ax3.set_title("Survival by Class")
     st.pyplot(fig3)
 
 with col4:
     st.markdown("#### 💰 Fare Distribution")
-    fig4, ax4 = plt.subplots(figsize=(5,3))
-    # ================================
-# 🔸 Row 4: Avg Fare by Gender & Avg Age by Class
+    fig4, ax4 = plt.subplots(figsize=(5, 3))
+    sns.histplot(df["Fare"], kde=True, bins=30, ax=ax4, color='orange')
+    ax4.set_title("Fare Distribution")
+    st.pyplot(fig4)
+
+# ================================
+# 🔸 Row 3: Avg Fare by Gender & Avg Age by Class
+col5, col6 = st.columns(2)
+
+with col5:
+    st.markdown("#### 📌 Average Fare by Gender")
+    fig5, ax5 = plt.subplots(figsize=(5, 3))
+    sns.barplot(data=df, x="Sex", y="Fare", ax=ax5, palette="Set2")
+    ax5.set_title("Average Fare by Gender")
+    st.pyplot(fig5)
+
+with col6:
+    st.markdown("#### 🎓 Average Age by Class")
+    fig6, ax6 = plt.subplots(figsize=(5, 3))
+    sns.barplot(data=df, x="Pclass", y="Age", ax=ax6, palette="Set3")
+    ax6.set_title("Average Age by Class")
+    st.pyplot(fig6)
+
+# ================================
+# 🔸 Row 4: Embark Count & Survival by Gender
 col7, col8 = st.columns(2)
 
 with col7:
-    st.markdown("#### 📌 Average Fare by Gender")
-    fig8, ax8 = plt.subplots(figsize=(5, 3))
-    sns.barplot(data=df, x="Sex", y="Fare", ax=ax8)
-    ax8.set_title("Average Fare by Gender")
-    st.pyplot(fig8)
+    st.markdown("#### 🧾 Passenger Count by Embarkation")
+    fig7, ax7 = plt.subplots(figsize=(5, 3))
+    sns.countplot(data=df, x="Embarked", ax=ax7, palette="pastel")
+    ax7.set_title("Embarkation Port Count")
+    st.pyplot(fig7)
 
 with col8:
-    st.markdown("#### 🎓 Average Age by Class")
-    fig9, ax9 = plt.subplots(figsize=(5, 3))
-    sns.barplot(data=df, x="Pclass", y="Age", ax=ax9)
-    ax9.set_title("Average Age by Class")
-    st.pyplot(fig9)
+    st.markdown("#### ✅ Survival Rate by Gender")
+    fig8, ax8 = plt.subplots(figsize=(5, 3))
+    sns.barplot(data=df, x="Sex", y="Survived", ci=None, ax=ax8, palette="coolwarm")
+    ax8.set_title("Survival Rate by Gender")
+    st.pyplot(fig8)
 
 # ================================
-# 🔸 Row 5: Passenger Count by Embark & Survival by Gender
+# 🔸 Row 5: Correlation Heatmap & Pie Chart
 col9, col10 = st.columns(2)
 
 with col9:
-    st.markdown("#### 🧾 Passenger Count by Embarkation")
-    fig10, ax10 = plt.subplots(figsize=(5, 3))
-    sns.countplot(data=df, x="Embarked", ax=ax10)
-    ax10.set_title("Embarkation Port Count")
-    st.pyplot(fig10)
+    st.markdown("#### 🧠 Correlation Heatmap")
+    fig9, ax9 = plt.subplots(figsize=(6, 4))
+    corr = df.select_dtypes(include=['float64', 'int64']).corr()
+    sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax9)
+    ax9.set_title("Feature Correlation")
+    st.pyplot(fig9)
 
 with col10:
-    st.markdown("#### ✅ Survival Rate by Gender")
-    fig11, ax11 = plt.subplots(figsize=(5, 3))
-    sns.barplot(data=df, x="Sex", y="Survived", ci=None, ax=ax11)
-    ax11.set_title("Survival Rate by Gender")
-    st.pyplot(fig11)
+    st.markdown("#### 🧩 Survival Pie Chart")
+    survived_counts = df["Survived"].value_counts()
+    fig10, ax10 = plt.subplots(figsize=(5, 3))
+    colors = ['salmon', 'lightgreen']
+    ax10.pie(survived_counts, labels=["Not Survived", "Survived"],
+             autopct='%1.1f%%', startangle=90, colors=colors)
+    ax10.set_title("Survival Distribution")
+    ax10.axis("equal")
+    st.pyplot(fig10)
 
+# ================================
+# 🔸 Full-width: Survival by Embarkation Port
+st.markdown("#### 🛳️ Survival by Embarkation Port")
+fig11, ax11 = plt.subplots(figsize=(10, 3))
+sns.countplot(data=df, x="Embarked", hue="Survived", ax=ax11, palette="muted")
+ax11.set_title("Survival by Embarkation Port")
+st.pyplot(fig11)
 
-
+# Footer
+st.markdown("---")
+st.markdown("💡 *Use the sidebar to explore Titanic passengers by class and gender.*")
