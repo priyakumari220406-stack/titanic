@@ -2,121 +2,128 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import base64
 
-# Set style
-sns.set_style("whitegrid")
-
-# Page Config
-st.set_page_config(page_title="Titanic EDA Dashboard", layout="wide")
-
-# ===== Background CSS =====
-st.markdown(
-    """
+# ----------------------------
+# Function to set background
+# ----------------------------
+def set_background(png_file):
+    with open(png_file, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode()
+    css = f"""
     <style>
-    .stApp {
-        background-image: url("https://images.unsplash.com/photo-1607746882042-944635dfe10e");
+    .stApp {{
+        background-image: url("data:image/png;base64,{encoded_string}");
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
-    }
-
-    .block-container {
-        background-color: rgba(255, 255, 255, 0.85);
-        padding: 2rem;
-        border-radius: 10px;
-    }
-
-    .css-1v0mbdj, .css-1dp5vir {
-        background-color: rgba(255, 255, 255, 0.8) !important;
-    }
+    }}
     </style>
-    """,
-    unsafe_allow_html=True
-)
+    """
+    st.markdown(css, unsafe_allow_html=True)
 
-# ===== Title =====
+# ----------------------------
+# Set up the page
+# ----------------------------
+st.set_page_config(page_title="Titanic EDA Dashboard", layout="wide")
+set_background("b6084c84-d281-4fc0-9e3d-3f313decf481.png")
+
+# Title
 st.title("🚢 Titanic Data Analytics Dashboard")
 
-# ===== Load Data =====
+# Load data
 df = pd.read_csv("cleaned_titanic.csv")
 
-# ===== Show Raw Data =====
-if st.checkbox("Show Raw Data"):
-    st.dataframe(df)
+# Filters on main page
+st.markdown("### 🔍 Apply Filters")
+col_filter1, col_filter2, col_filter3, col_filter4 = st.columns(4)
 
-# ===== Sidebar Filters =====
-st.sidebar.header("🔍 Filter Options")
+with col_filter1:
+    selected_genders = st.multiselect("Select Gender", options=df["Sex"].unique(), default=df["Sex"].unique())
 
-gender = st.sidebar.multiselect("Select Gender", options=df["Sex"].unique(), default=list(df["Sex"].unique()))
-pclass = st.sidebar.multiselect("Select Passenger Class", options=sorted(df["Pclass"].unique()), default=sorted(df["Pclass"].unique()))
-age_range = st.sidebar.slider("Select Age Range", min_value=int(df["Age"].min()), max_value=int(df["Age"].max()), value=(int(df["Age"].min()), int(df["Age"].max())))
-fare_range = st.sidebar.slider("Select Fare Range", min_value=int(df["Fare"].min()), max_value=int(df["Fare"].max()), value=(int(df["Fare"].min()), int(df["Fare"].max())))
+with col_filter2:
+    selected_pclass = st.multiselect("Select Passenger Class", options=sorted(df["Pclass"].unique()), default=sorted(df["Pclass"].unique()))
 
-# ===== Filter Data =====
+with col_filter3:
+    min_age = int(df["Age"].min())
+    max_age = int(df["Age"].max())
+    selected_age_range = st.slider("Select Age Range", min_value=min_age, max_value=max_age, value=(min_age, max_age))
+
+with col_filter4:
+    min_fare = int(df["Fare"].min())
+    max_fare = int(df["Fare"].max())
+    selected_fare_range = st.slider("Select Fare Range", min_value=min_fare, max_value=max_fare, value=(min_fare, max_fare))
+
+# Filtered Data
 filtered_df = df[
-    (df["Sex"].isin(gender)) &
-    (df["Pclass"].isin(pclass)) &
-    (df["Age"].between(age_range[0], age_range[1])) &
-    (df["Fare"].between(fare_range[0], fare_range[1]))
+    (df["Sex"].isin(selected_genders)) &
+    (df["Pclass"].isin(selected_pclass)) &
+    (df["Age"].between(*selected_age_range)) &
+    (df["Fare"].between(*selected_fare_range))
 ]
 
-st.subheader("🎯 Filtered Data Preview")
-st.write(filtered_df.head())
+st.markdown("### 🎯 Filtered Data Preview")
+st.dataframe(filtered_df.head(10))
 
-# ===== ROW 1 =====
+# ---------------------
+# Visualizations
+# ---------------------
+def plot_chart(fig, title):
+    st.markdown(f"#### {title}")
+    st.pyplot(fig)
+
+# Row 1
 col1, col2 = st.columns(2)
 with col1:
-    st.markdown("#### 📊 Survival Count by Gender")
     fig1, ax1 = plt.subplots(figsize=(5, 3))
-    sns.countplot(data=filtered_df, x="Survived", hue="Sex", ax=ax1, palette="pastel")
-    st.pyplot(fig1)
+    sns.countplot(data=filtered_df, x="Survived", hue="Sex", palette="Set2", ax=ax1)
+    ax1.set_title("Survival by Gender")
+    plot_chart(fig1, "📊 Survival Count by Gender")
 
 with col2:
-    st.markdown("#### 🎂 Age Distribution")
     fig2, ax2 = plt.subplots(figsize=(5, 3))
-    sns.histplot(filtered_df["Age"].dropna(), kde=True, bins=25, ax=ax2, color='skyblue')
-    st.pyplot(fig2)
+    sns.histplot(filtered_df["Age"].dropna(), kde=True, bins=25, color="orange", ax=ax2)
+    ax2.set_title("Age Distribution")
+    plot_chart(fig2, "🎂 Age Distribution")
 
-# ===== ROW 2 =====
+# Row 2
 col3, col4 = st.columns(2)
 with col3:
-    st.markdown("#### 🏷️ Survival Rate by Class")
     fig3, ax3 = plt.subplots(figsize=(5, 3))
-    sns.barplot(data=filtered_df, x="Pclass", y="Survived", ci=None, ax=ax3, palette="Blues")
-    st.pyplot(fig3)
+    sns.barplot(data=filtered_df, x="Pclass", y="Survived", ci=None, palette="Blues", ax=ax3)
+    ax3.set_title("Survival by Class")
+    plot_chart(fig3, "🏷️ Survival Rate by Class")
 
 with col4:
-    st.markdown("#### 💰 Fare Distribution")
     fig4, ax4 = plt.subplots(figsize=(5, 3))
-    sns.histplot(filtered_df["Fare"], kde=True, bins=30, ax=ax4, color='orange')
-    st.pyplot(fig4)
+    sns.histplot(filtered_df["Fare"].dropna(), kde=True, bins=30, color="gold", ax=ax4)
+    ax4.set_title("Fare Distribution")
+    plot_chart(fig4, "💰 Fare Distribution")
 
-# ===== ROW 3 =====
+# Row 3
 col5, col6 = st.columns(2)
 with col5:
-    st.markdown("#### 📌 Average Fare by Gender")
     fig5, ax5 = plt.subplots(figsize=(5, 3))
-    sns.barplot(data=filtered_df, x="Sex", y="Fare", ax=ax5, palette="Set2")
-    st.pyplot(fig5)
+    sns.barplot(data=filtered_df, x="Sex", y="Fare", palette="pastel", ax=ax5)
+    ax5.set_title("Average Fare by Gender")
+    plot_chart(fig5, "📌 Average Fare by Gender")
 
 with col6:
-    st.markdown("#### 🎓 Average Age by Class")
     fig6, ax6 = plt.subplots(figsize=(5, 3))
-    sns.barplot(data=filtered_df, x="Pclass", y="Age", ax=ax6, palette="Set3")
-    st.pyplot(fig6)
+    sns.barplot(data=filtered_df, x="Pclass", y="Age", palette="Purples", ax=ax6)
+    ax6.set_title("Average Age by Class")
+    plot_chart(fig6, "🎓 Average Age by Class")
 
-# ===== ROW 4 =====
+# Row 4
 col7, col8 = st.columns(2)
 with col7:
-    st.markdown("#### 🧾 Passenger Count by Embarkation")
     fig7, ax7 = plt.subplots(figsize=(5, 3))
-    sns.countplot(data=filtered_df, x="Embarked", ax=ax7, palette="pastel")
-    st.pyplot(fig7)
+    sns.countplot(data=filtered_df, x="Embarked", palette="Set3", ax=ax7)
+    ax7.set_title("Embarkation Port Count")
+    plot_chart(fig7, "🧾 Passenger Count by Embarkation")
 
 with col8:
-    st.markdown("#### ✅ Survival Rate by Gender")
     fig8, ax8 = plt.subplots(figsize=(5, 3))
-    sns.barplot(data=filtered_df, x="Sex", y="Survived", ci=None, ax=ax8, palette="coolwarm")
-    st.pyplot(fig8)
-
-
+    sns.barplot(data=filtered_df, x="Sex", y="Survived", ci=None, palette="coolwarm", ax=ax8)
+    ax8.set_title("Survival Rate by Gender")
+    plot_chart(fig8, "✅ Survival Rate by Gender")
